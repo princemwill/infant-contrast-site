@@ -1,1 +1,2 @@
-/* /index.html 200
+# Send unknown routes to the 404 page (Pages serves 404.html by default, but this is explicit)
+/*    /404.html   404
