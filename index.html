@@ -2,40 +2,33 @@
 <html lang="en">
 <head>
   <!--
-    High-Contrast Baby Carousel (single-file MVP)
-    ------------------------------------------------
-    Security & privacy notes:
-    - No user data collected by default.
-    - GA4 is optional and anonymized (anonymize_ip).
-    - AdSense placeholder only; when enabled, tag as child-directed.
-    - No external assets; all visuals are inline SVG.
+    InfantContrast.com — High-Contrast Baby Carousel (single-file MVP)
+    No analytics yet (CSP kept strict). Add GA or Plausible later and update CSP in `_headers`.
   -->
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <!-- ====== SEO: Title, Description, Canonical ====== -->
+  <!-- SEO -->
   <title>Infant Contrast — High-Contrast Baby Carousel (Free)</title>
   <meta name="description" content="Free, full-screen, swipeable black & white visuals for newborns and young infants. Tap or swipe to cycle soothing, high-contrast patterns." />
   <link rel="canonical" href="https://infantcontrast.com/" />
 
-  <!-- Theme color for address bar -->
+  <!-- Theme -->
   <meta name="theme-color" content="#000000" />
   <meta name="color-scheme" content="light dark" />
 
-  <!-- ====== Open Graph / Twitter Cards ====== -->
+  <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Infant Contrast — High-Contrast Baby Carousel">
   <meta property="og:description" content="Free, swipeable black & white visuals for infants.">
   <meta property="og:url" content="https://infantcontrast.com/">
   <meta property="og:image" content="https://infantcontrast.com/og-image.png">
-
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Infant Contrast — High-Contrast Baby Carousel">
   <meta name="twitter:description" content="Free, swipeable black & white visuals for infants.">
   <meta name="twitter:image" content="https://infantcontrast.com/og-image.png">
 
-  <!-- ====== JSON-LD basic Website markup ====== -->
+  <!-- JSON-LD basic Website markup -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -45,17 +38,7 @@
   }
   </script>
 
-  <!-- ====== Google Analytics 4 (optional) ====== -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXX', { anonymize_ip: true });
-  </script>
-
   <style>
-    /* ========= Global Reset + Layout ========= */
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       height: 100%;
@@ -71,69 +54,14 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif;
     }
 
-    .app {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      grid-template-rows: 1fr auto;
-      background: #000;
-    }
+    .app { position: fixed; inset: 0; display: grid; grid-template-rows: 1fr auto; background: #000; }
+    .stage { position: relative; overflow: hidden; width: 100vw; height: 100svh; height: 100vh; touch-action: none; user-select: none; }
+    .track { display: flex; width: 100%; height: 100%; will-change: transform; transition: transform 220ms ease-out; }
+    .slide { flex: 0 0 100%; height: 100%; display: grid; place-items: center; background: #000; }
+    .visual { width: min(92vw, 92vh); height: auto; max-height: 92vh; display: block; }
+    .hint { position: absolute; inset-inline: 0; bottom: 0.75rem; text-align: center; font-size: 0.85rem; opacity: 0.65; pointer-events: none; }
 
-    .stage {
-      position: relative;
-      overflow: hidden;
-      width: 100vw;
-      height: 100svh;
-      height: 100vh;
-      touch-action: none;
-      user-select: none;
-    }
-
-    .track {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      will-change: transform;
-      transition: transform 220ms ease-out;
-    }
-
-    .slide {
-      flex: 0 0 100%;
-      height: 100%;
-      display: grid;
-      place-items: center;
-      background: #000;
-    }
-
-    .visual {
-      width: min(92vw, 92vh);
-      height: auto;
-      max-height: 92vh;
-      display: block;
-    }
-
-    .hint {
-      position: absolute;
-      inset-inline: 0;
-      bottom: 0.75rem;
-      text-align: center;
-      font-size: 0.85rem;
-      opacity: 0.65;
-      pointer-events: none;
-    }
-
-    .adbar {
-      position: sticky;
-      bottom: 0;
-      width: 100%;
-      background: #0a0a0a;
-      border-top: 1px solid #111;
-      padding: 6px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-    }
+    .adbar { position: sticky; bottom: 0; width: 100%; background: #0a0a0a; border-top: 1px solid #111; padding: 6px 10px; display: flex; align-items: center; justify-content: center; min-height: 44px; }
     .adbar small { opacity: 0.7; }
 
     ::-webkit-scrollbar { width: 0; height: 0; }
@@ -141,17 +69,10 @@
 </head>
 <body>
   <main class="app" aria-label="High-contrast image carousel for infants">
-    <section
-      class="stage"
-      id="stage"
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="High-contrast visuals — slide 1 of 7"
-      tabindex="0">
+    <section class="stage" id="stage" role="region" aria-roledescription="carousel" aria-label="High-contrast visuals — slide 1 of 7" tabindex="0">
       <div class="track" id="track"></div>
       <div class="hint" aria-hidden="true">Swipe left/right • Arrow keys also work</div>
     </section>
-
     <aside class="adbar" aria-label="Advertisement area">
       <small>Ad space (placeholder). Your ad will appear here once configured.</small>
     </aside>

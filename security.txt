@@ -1,0 +1,3 @@
+Contact: mailto:hello@infantcontrast.com
+Policy: https://infantcontrast.com/
+Preferred-Languages: en
