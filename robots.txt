@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://infantcontrast.com/sitemap.xml
