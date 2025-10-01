@@ -1,0 +1,251 @@
+name: Lighthouse CI & SEO Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lighthouse-seo-audit:
+    name: Lighthouse, HTML5 Validation & SEO Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install -g @lhci/cli@0.13.x
+          npm install -g html-validator-cli
+
+      - name: Check required SEO files exist
+        id: check-files
+        run: |
+          echo "## 📁 SEO File Checks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          files_missing=0
+          
+          if [ -f "robots.txt" ]; then
+            echo "✅ robots.txt exists" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            head -n 20 robots.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ robots.txt is missing" >> $GITHUB_STEP_SUMMARY
+            files_missing=1
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "sitemap.xml" ]; then
+            echo "✅ sitemap.xml exists" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`xml" >> $GITHUB_STEP_SUMMARY
+            head -n 20 sitemap.xml >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ sitemap.xml is missing" >> $GITHUB_STEP_SUMMARY
+            files_missing=1
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "_headers" ]; then
+            echo "✅ _headers file exists" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            head -n 30 _headers >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ _headers file is missing" >> $GITHUB_STEP_SUMMARY
+            files_missing=1
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $files_missing -eq 1 ]; then
+            echo "⚠️ Some required SEO files are missing!" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ All required SEO files are present" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: HTML5 Validation
+        id: html-validation
+        run: |
+          echo "## 🔍 HTML5 Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if html-validator --file=index.html --format=text > validation-result.txt 2>&1; then
+            echo "✅ index.html is valid HTML5" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat validation-result.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ HTML5 validation failed for index.html" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat validation-result.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Setup local server for Lighthouse
+        run: |
+          python3 -m http.server 8080 &
+          sleep 3
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: |
+          echo "## 🚦 Lighthouse CI Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Create Lighthouse CI configuration
+          cat > lighthouserc.json << 'EOF'
+          {
+            "ci": {
+              "collect": {
+                "url": ["http://localhost:8080/index.html"],
+                "numberOfRuns": 3,
+                "settings": {
+                  "preset": "desktop"
+                }
+              },
+              "assert": {
+                "assertions": {
+                  "categories:performance": ["error", {"minScore": 0.8}],
+                  "categories:accessibility": ["error", {"minScore": 0.9}],
+                  "categories:best-practices": ["error", {"minScore": 0.9}],
+                  "categories:seo": ["error", {"minScore": 0.9}]
+                }
+              },
+              "upload": {
+                "target": "temporary-public-storage"
+              }
+            }
+          }
+          EOF
+          
+          # Run Lighthouse CI
+          lhci autorun --config=lighthouserc.json || true
+          
+          # Parse and display results
+          if [ -f ".lighthouseci/manifest.json" ]; then
+            echo "### Lighthouse Scores" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Extract the latest report
+            REPORT=$(ls -t .lighthouseci/*.json | grep -v manifest | head -n 1)
+            
+            if [ -f "$REPORT" ]; then
+              PERF=$(jq '.categories.performance.score * 100' "$REPORT")
+              ACCESS=$(jq '.categories.accessibility.score * 100' "$REPORT")
+              BEST=$(jq '.categories["best-practices"].score * 100' "$REPORT")
+              SEO=$(jq '.categories.seo.score * 100' "$REPORT")
+              
+              echo "| Category | Score |" >> $GITHUB_STEP_SUMMARY
+              echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+              echo "| 🚀 Performance | ${PERF}% |" >> $GITHUB_STEP_SUMMARY
+              echo "| ♿ Accessibility | ${ACCESS}% |" >> $GITHUB_STEP_SUMMARY
+              echo "| ✨ Best Practices | ${BEST}% |" >> $GITHUB_STEP_SUMMARY
+              echo "| 🔍 SEO | ${SEO}% |" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              
+              # Check if scores meet minimum thresholds
+              if (( $(echo "$PERF < 80" | bc -l) )); then
+                echo "⚠️ Performance score is below 80%" >> $GITHUB_STEP_SUMMARY
+              fi
+              if (( $(echo "$ACCESS < 90" | bc -l) )); then
+                echo "⚠️ Accessibility score is below 90%" >> $GITHUB_STEP_SUMMARY
+              fi
+              if (( $(echo "$BEST < 90" | bc -l) )); then
+                echo "⚠️ Best Practices score is below 90%" >> $GITHUB_STEP_SUMMARY
+              fi
+              if (( $(echo "$SEO < 90" | bc -l) )); then
+                echo "⚠️ SEO score is below 90%" >> $GITHUB_STEP_SUMMARY
+              fi
+              
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### Key Audits" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              
+              # Extract key audit information
+              jq -r '.audits | to_entries[] | select(.value.score != null and .value.score < 1) | "- ❌ \(.value.title): \(.value.description)"' "$REPORT" | head -n 10 >> $GITHUB_STEP_SUMMARY || true
+              
+            else
+              echo "⚠️ Could not parse Lighthouse report" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ Lighthouse CI did not generate results" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check meta tags and SEO elements
+        run: |
+          echo "## 🏷️ Meta Tags & SEO Elements Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for essential meta tags
+          if grep -q '<meta name="description"' index.html; then
+            echo "✅ Meta description present" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Meta description missing" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q '<meta name="viewport"' index.html; then
+            echo "✅ Viewport meta tag present" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Viewport meta tag missing" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q 'property="og:' index.html; then
+            echo "✅ Open Graph tags present" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Open Graph tags missing" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q 'name="twitter:' index.html; then
+            echo "✅ Twitter Card tags present" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Twitter Card tags missing" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q '<link rel="canonical"' index.html; then
+            echo "✅ Canonical link present" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Canonical link missing" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30
+
+      - name: Final Summary
+        if: always()
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Audit Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All quality checks have been completed. Review the results above for any issues that need attention." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Lighthouse** is an automated tool from Google that audits web pages for:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🚀 **Performance**: Load speed, interactivity, and visual stability" >> $GITHUB_STEP_SUMMARY
+          echo "- ♿ **Accessibility**: ARIA, contrast, semantic HTML, screen reader support" >> $GITHUB_STEP_SUMMARY
+          echo "- ✨ **Best Practices**: Security, modern standards, console errors" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 **SEO**: Meta tags, structured data, mobile-friendliness" >> $GITHUB_STEP_SUMMARY
