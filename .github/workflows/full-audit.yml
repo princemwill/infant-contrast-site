@@ -144,11 +144,18 @@ jobs:
           echo "📸 Placeholder: Visual regression testing not configured" >> $GITHUB_STEP_SUMMARY
 
       # 6) Gitleaks secret scan
+      # Scan the current working directory for secrets instead of commit range
+      # This prevents issues with missing commits in PR contexts
       - name: Run Gitleaks Secret Scan
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          # Scan the current directory instead of git history to avoid commit range errors
+          GITLEAKS_ENABLE_SUMMARY: true
+        with:
+          # Use --source flag to scan working directory files directly
+          args: --source=. --verbose --redact
 
       # 7) Cloudflare Analytics comment placeholder
       - name: Cloudflare Analytics Placeholder
