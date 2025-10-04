@@ -1,38 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <!-- SEO -->
   <title>InfantContrast — Free High-Contrast Baby Cards</title>
-  <meta name="description" content="Free high-contrast black-and-white visuals for newborns and young infants. Swipe full-screen or print at home. No accounts, parent-friendly, ad-light." />
-  <link rel="canonical" href="https://infantcontrast.com/" />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-
+  <meta name="description" content="Free high-contrast black-and-white visuals for newborns and young infants. Swipe full-screen or print at home. No accounts, parent-friendly, ad-light."/>
+  <link rel="canonical" href="https://infantcontrast.com/"/>
+  <meta name="robots" content="index,follow,max-image-preview:large"/>
   <!-- Icons (favicon ready; apple/og pngs can come later) -->
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="InfantContrast" />
-  <meta property="og:title" content="InfantContrast — Free High-Contrast Baby Cards" />
-  <meta property="og:description" content="Free B/W visuals for infants. Swipe full-screen or print at home." />
-  <meta property="og:url" content="https://infantcontrast.com/" />
-  <meta property="og:image" content="https://infantcontrast.com/og-image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:image:alt" content="Black background with white concentric rings and text InfantContrast.com — Free High-Contrast Baby Cards" />
-
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="InfantContrast"/>
+  <meta property="og:title" content="InfantContrast — Free High-Contrast Baby Cards"/>
+  <meta property="og:description" content="Free B/W visuals for infants. Swipe full-screen or print at home."/>
+  <meta property="og:url" content="https://infantcontrast.com/"/>
+  <meta property="og:image" content="https://infantcontrast.com/og-image.jpg"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:image:alt" content="Black background with white concentric rings and text InfantContrast.com — Free High-Contrast Baby Cards"/>
   <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="InfantContrast — Free High-Contrast Baby Cards" />
-  <meta name="twitter:description" content="Free B/W visuals for infants. Swipe full-screen or print at home." />
-  <meta name="twitter:image" content="https://infantcontrast.com/og-image.png" />
-  <meta name="twitter:image:alt" content="Black background with white concentric rings and text InfantContrast.com — Free High-Contrast Baby Cards" />
-
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="InfantContrast — Free High-Contrast Baby Cards"/>
+  <meta name="twitter:description" content="Free B/W visuals for infants. Swipe full-screen or print at home."/>
+  <meta name="twitter:image" content="https://infantcontrast.com/og-image.jpg"/>
+  <meta name="twitter:image:alt" content="Black background with white concentric rings and text InfantContrast.com — Free High-Contrast Baby Cards"/>
   <!-- JSON-LD -->
   <script type="application/ld+json">
   {
@@ -44,10 +39,9 @@
     "potentialAction": { "@type": "ViewAction", "target": "https://infantcontrast.com/" }
   }
   </script>
-
   <!-- Styles -->
-  <meta name="theme-color" content="#000000" />
-  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#000000"/>
+  <meta name="color-scheme" content="light dark"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
@@ -64,43 +58,40 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif;
     }
     a { color: #9bd; }
-
     .app { position: fixed; inset: 0; display: grid; grid-template-rows: 1fr auto; background: #000; }
     .stage { position: relative; overflow: hidden; width: 100vw; height: 100svh; height: 100vh; touch-action: none; user-select: none; }
     .track { display: flex; width: 100%; height: 100%; will-change: transform; transition: transform 220ms ease-out; }
     .slide { flex: 0 0 100%; height: 100%; display: grid; place-items: center; background: #000; }
     .visual { width: min(92vw, 92vh); height: auto; max-height: 92vh; display: block; }
     .hint { position: absolute; inset-inline: 0; bottom: 0.75rem; text-align: center; font-size: 0.95rem; opacity: 0.7; pointer-events: none; }
-
     .site-footer { position: sticky; bottom: 0; width: 100%; background: #0a0a0a; border-top: 1px solid #111; padding: 8px 10px; display: grid; gap: 6px; justify-items: center; }
     .footer-nav { display:flex; gap:10px; flex-wrap:wrap; justify-content:center }
     .site-footer small { opacity: 0.75; }
-
     :focus { outline: 2px solid #7bd; outline-offset: 2px; }
     ::-webkit-scrollbar { width: 0; height: 0; }
-
     @media (prefers-reduced-motion: reduce) { .track { transition: none !important; } }
-
     .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
     .skip-link:focus{left:12px;top:12px;width:auto;height:auto;background:#111;color:#fff;padding:8px 10px;border-radius:8px;outline:2px solid #7bd}
   </style>
+  <link rel="preload" href="/apple-touch-icon.png" as="image" imagesrcset="/apple-touch-icon.png 1x" imagesizes="180x180"/>
+  <!-- Google Analytics (placeholder ID) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXX', { anonymize_ip: true });
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <main id="main" class="app" aria-label="High-contrast image carousel for infants">
-    <section
-      class="stage"
-      id="stage"
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="High-contrast visuals — slide 1 of 7"
-      tabindex="0">
+    <section class="stage" id="stage" role="region" aria-roledescription="carousel" aria-label="High-contrast visuals — slide 1 of 7" tabindex="0">
       <div class="track" id="track"></div>
       <div class="hint" aria-hidden="true">Swipe left/right • Arrow keys also work</div>
     </section>
-
     <footer class="site-footer" role="contentinfo">
-      <nav aria-label="Footer" class="footer-nav">
+      <nav class="footer-nav" aria-label="Footer">
         <a href="/">Home</a>
         <span aria-hidden="true">·</span> <a href="/about.html">About</a>
         <span aria-hidden="true">·</span> <a href="/faq.html">FAQ</a>
@@ -111,7 +102,6 @@
       <small>© 2025 InfantContrast • <a href="mailto:hello@infantcontrast.com">hello@infantcontrast.com</a></small>
     </footer>
   </main>
-
   <script>
     "use strict";
     const visuals = [
@@ -186,13 +176,11 @@
         </svg>
       `
     ];
-
     const trackEl = document.getElementById("track");
     const stageEl = document.getElementById("stage");
     const slideCount = visuals.length;
     let index = 0;
     const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     const slides = visuals.map((makeSvg, i) => {
       const el = document.createElement("div");
       el.className = "slide";
@@ -203,12 +191,10 @@
       return el;
     });
     slides.forEach(s => trackEl.appendChild(s));
-
     function applyTransform(px) {
       const x = Math.max(Math.min(px, 2000), -2000);
       trackEl.style.transform = `translate3d(${x}px, 0, 0)`;
     }
-
     function goTo(i, {announce=true} = {}) {
       index = (i + slideCount) % slideCount;
       const offset = -index * stageEl.clientWidth;
@@ -216,19 +202,15 @@
       applyTransform(offset);
       if (announce) { stageEl.setAttribute("aria-label", `High-contrast visuals — slide ${index+1} of ${slideCount}`); }
     }
-
     trackEl.style.transition = prefersReducedMotion ? "none" : "transform 220ms ease-out";
     goTo(0, {announce:false});
-
     let resizeRAF = 0;
     window.addEventListener("resize", () => {
       cancelAnimationFrame(resizeRAF);
       resizeRAF = requestAnimationFrame(() => goTo(index, {announce:false}));
     }, { passive: true });
-
     let dragging = false, startX = 0, currentX = 0, startOffset = 0;
     const SWIPE_THRESHOLD = 40;
-
     function onPointerDown(e) {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       dragging = true;
@@ -253,13 +235,11 @@
       else if (dx >= SWIPE_THRESHOLD) { goTo(index - 1); }
       else { goTo(index, {announce:false}); }
     }
-
     stageEl.addEventListener("pointerdown", onPointerDown);
     stageEl.addEventListener("pointermove", onPointerMove);
     stageEl.addEventListener("pointerup", onPointerUp);
     stageEl.addEventListener("pointercancel", onPointerUp);
     stageEl.addEventListener("lostpointercapture", onPointerUp);
-
     stageEl.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft") { e.preventDefault(); goTo(index - 1); }
       if (e.key === "ArrowRight") { e.preventDefault(); goTo(index + 1); }
