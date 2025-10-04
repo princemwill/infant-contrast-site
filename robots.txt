@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+Disallow: /admin
+Disallow: /drafts
+
 Sitemap: https://infantcontrast.com/sitemap.xml
